@@ -15,21 +15,8 @@ public class AnimUtils {
         String propertyName;
 
         if (x1 == x2) {
-            propertyName = "y";
-            if (y1 < y2) {
-                box1Start = box1.getY();
-                box1End = box1.getY() + BaseBox.SIZE + BaseBox.MARGIN;
-                box2Start = box2.getY();
-                box2End = box2.getY() - BaseBox.SIZE - BaseBox.MARGIN;
-            } else {
-                box1Start = box1.getY();
-                box1End = box1.getY() - BaseBox.SIZE - BaseBox.MARGIN;
-                box2Start = box2.getY();
-                box2End = box2.getY() + BaseBox.SIZE + BaseBox.MARGIN;
-            }
-        } else {
             propertyName = "x";
-            if (x1 < x2) {
+            if (y1 < y2) {
                 box1Start = box1.getX();
                 box1End = box1.getX() + BaseBox.SIZE + BaseBox.MARGIN;
                 box2Start = box2.getX();
@@ -39,6 +26,19 @@ public class AnimUtils {
                 box1End = box1.getX() - BaseBox.SIZE - BaseBox.MARGIN;
                 box2Start = box2.getX();
                 box2End = box2.getX() + BaseBox.SIZE + BaseBox.MARGIN;
+            }
+        } else {
+            propertyName = "y";
+            if (x1 < x2) {
+                box1Start = box1.getY();
+                box1End = box1.getY() + BaseBox.SIZE + BaseBox.MARGIN;
+                box2Start = box2.getY();
+                box2End = box2.getY() - BaseBox.SIZE - BaseBox.MARGIN;
+            } else {
+                box1Start = box1.getY();
+                box1End = box1.getY() - BaseBox.SIZE - BaseBox.MARGIN;
+                box2Start = box2.getY();
+                box2End = box2.getY() + BaseBox.SIZE + BaseBox.MARGIN;
             }
         }
 

@@ -10,8 +10,6 @@ public class Algo {
 
     private static final String TAG = "Dong";
 
-    public static int a[][];
-
     public static boolean swapSucceed(BaseBox[][] boxes, int x1, int y1, int x2, int y2, int[][] move) {
 
         int result1 = check(boxes, x1, y1, move);
@@ -21,10 +19,12 @@ public class Algo {
 
         if (result1 > 0) {
             award(boxes, result1, x1, y1, move);
+            dumpArray(move);
             goDwon(move, boxes);
         }
         if (result2 > 0) {
             award(boxes, result2, x2, y2, move);
+            dumpArray(move);
             goDwon(move, boxes);
         }
 
@@ -34,12 +34,15 @@ public class Algo {
     static void goDwon(int[][] b, BaseBox[][] a) {
         int high = a.length;
         int wide = a[0].length;
+        int moveSize = 0;
 
-        for (int i = high - 1; i > 0; i--) {
+        for (int i = high - 1; i >= 0; i--) {
             for (int j = 0; j < wide; j++) {
+                moveSize = b[i][j];
+                //移动格数>0，向下移动
+                if (moveSize > 0) {
 
-                if (b[i][j] > 0) {
-                    a[i - b[i][j]][j].mType = a[i][j].mType;
+                    a[(i + moveSize)][j].mType = a[i][j].mType;
                     a[i][j].mType = 0;
                 }
 
@@ -158,12 +161,15 @@ public class Algo {
     private static void award(BaseBox[][] a, int num, int x, int y, int[][] b) {
         if (num == 3) {
             a[x][y].mType = 0;//中心点置0清空
+            b[x][y] = 0;//中心点移动位置清空
 
             // == 3是，该位置正上方的所有位置移动格数+1
-            for (int i = x - 1; i >= 0; i--) {
-                b[i][y]++;
+            for (int i = 1; i <= x; i++) {
+                if (a[x - i][y].mType != 0) {
+                    b[x - i][y]++;
+                }
             }
-            b[x][y] = 0;
+
         }
         if (num == 4)
             a[x][y].mType = 444;
@@ -180,48 +186,50 @@ public class Algo {
 
 
     //传入中心点的坐标，检查可消除的情况
-    private static int check(BaseBox[][] boxes, int x, int y, int b[][]) {
-        int high = boxes.length;
-        int wide = boxes[0].length;
+    private static int check(BaseBox[][] boxes, int centerX, int centerY, int move[][]) {
+        int height = boxes.length;
+        int width = boxes[0].length;
 
-        int type = boxes[x][y].mType;
+        int centerType = boxes[centerX][centerY].mType;
 
         int up, down, left, right;
 
         //先算上
         int i = 1;
         up = 0;
-        while (x - i >= 0 && type == boxes[x - i][y].mType) {
+        while (centerX - i >= 0 && centerType == boxes[centerX - i][centerY].mType) {
             up = up + 1;
             i = i + 1;
-            //a[x-i][y] = 0; //该位置至0，以便清空
+            Log.e(TAG, "上");
         }
 
         //下
         i = 1;
         down = 0;
-        while (x + i < high && type == boxes[x + i][y].mType) {
+        while (centerX + i < height && centerType == boxes[centerX + i][centerY].mType) {
             down = down + 1;
             i = i + 1;
-            //a[x+i][y] = 0;//该位置至0，以便清空
+            Log.e(TAG, "下");
+
         }
 
         //左
         i = 1;
         left = 0;
-        while (y - i >= 0 && type == boxes[x][y - i].mType) {
+        while (centerY - i >= 0 && centerType == boxes[centerX][centerY - i].mType) {
             left = left + 1;
             i = i + 1;
-            //a[x][y-i] = 0;//该位置至0，以便清空
+            Log.e(TAG, "左");
         }
 
         //右
         i = 1;
         right = 0;
-        while (y + i < wide && type == boxes[x][y + i].mType) {
+        while (centerY + i < width && centerType == boxes[centerX][centerY + i].mType) {
             right = right + 1;
             i = i + 1;
-            //a[x][y+i] = 0;//该位置至0，以便清空
+            Log.e(TAG, "右");
+
         }
 
         //横竖都可以消除
@@ -229,46 +237,49 @@ public class Algo {
             //left
             for (i = 1; i <= left; i++) {
                 //可消除的位置至0，以便清空
-                boxes[x][y - i].mType = 0;
+                boxes[centerX][centerY - i].mType = 0;
 
                 //正上方所有位置移动格数+1
-                for (int j = 1; j < x; j++) {
-                    if (boxes[x - j][y - i].mType != 0)
-                        b[x - j][y - i]++;
+                for (int j = 1; j <= centerX; j++) {
+                    if (boxes[centerX - j][centerY - i].mType != 0) {
+                        move[centerX - j][centerY - i]++;
+                    }
                 }
-
             }
 
             //Right
             for (i = 1; i <= right; i++) {
                 //可消除的位置至0，以便清空
-                boxes[x][y + i].mType = 0;
+                boxes[centerX][centerY + i].mType = 0;
 
                 //正上方所有位置移动格数+1
-                for (int j = 1; j < x; j++) {
-                    if (boxes[x - j][y + i].mType != 0)
-                        b[x - j][y + i]++;
+                for (int j = 1; j <= centerX; j++) {
+                    if (boxes[centerX - j][centerY + i].mType != 0)
+                        move[centerX - j][centerY + i]++;
                 }
             }
-            //
-            b[x][y] += 1;
+
+            //move[centerX][centerY] ++;中心点不会掉落
 
             //up
             for (i = 1; i <= up; i++) {
-                boxes[x - i][y].mType = 0;
+                boxes[centerX - i][centerY].mType = 0;
             }
 
             //位置正上方的位置移动格数+up + down
-            for (int j = x - i; j >= 0; j--) {
-                if (a[j][y] != 0)
-                    b[j][y] += (up + down);
+            for (int j = i; j <= centerX; j++) {
+                if (boxes[centerX - j][centerY].mType != 0) {
+                    move[centerX - j][centerY] += (up + down);
+                }
             }
-            b[x][y] += (up + down);
 
             //down
             for (i = 1; i <= down; i++) {
-                boxes[x + i][y].mType = 0;
+                boxes[centerX + i][centerY].mType = 0;
             }
+
+            move[centerX][centerY] += down;
+
 
             //返回消除数量，以确定道具奖励
             return left + right + up + down + 1;
@@ -276,30 +287,34 @@ public class Algo {
 
         //横可消
         if (left + right + 1 >= 3) {
+            Log.e(TAG, "横可消");
+
             for (i = 1; i <= left; i++) {
                 //可消除的位置至0，以便清空
-                boxes[x][y - i].mType = 0;
+                boxes[centerX][centerY - i].mType = 0;
 
                 //正上方所有位置移动格数+1
-                for (int j = 1; j < x; j++) {
-                    if (boxes[x - j][y - i].mType != 0)
-                        b[x - j][y - i]++;
+                for (int j = 1; j <= centerX; j++) {
+                    if (boxes[centerX - j][centerY - i].mType != 0) {
+                        move[centerX - j][centerY - i]++;
+                    }
                 }
+
             }
 
             for (i = 1; i <= right; i++) {
                 //可消除的位置至0，以便清空
-                boxes[x][y + i].mType = 0;
+                boxes[centerX][centerY + i].mType = 0;
 
                 //正上方所有位置移动格数+1
-                for (int j = 1; j < x; j++) {
-                    if (boxes[x - j][y + i].mType != 0)
-                        b[x - j][y + i]++;
-
+                for (int j = 1; j <= centerX; j++) {
+                    if (boxes[centerX - j][centerY + i].mType != 0)
+                        move[centerX - j][centerY + i]++;
                 }
+
             }
-            //
-            b[x][y] += 1;
+
+            //move[centerX][centerY] += 1;
 
             //返回消除数量，以确定道具奖励
             return left + right + 1;
@@ -307,22 +322,26 @@ public class Algo {
 
         //竖可消
         if (up + down + 1 >= 3) {
+            Log.e(TAG, "竖可消");
+
             //可消除的位置至0，以便清空
             for (i = 1; i <= up; i++) {
-                boxes[x - i][y].mType = 0;
+                boxes[centerX - i][centerY].mType = 0;
             }
 
 
             //位置正上方的位置移动格数+up + down
-            for (int j = x - i; j >= 0; j--) {
-                if (a[j][y] != 0)
-                    b[j][y] += (up + down);
+            for (int j = i; j <= centerX; j++) {
+                if (boxes[centerX - j][centerY].mType != 0) {
+                    move[centerX - j][centerY] += (up + down);
+                }
             }
-            b[x][y] += (up + down);
+            //move[centerX][centerY] += (up + down);
 
             for (i = 1; i <= down; i++) {
-                boxes[x + i][y].mType = 0;
+                boxes[centerX + i][centerY].mType = 0;
             }
+            move[centerX][centerY] += down;
 
             //返回消除数量，以确定道具奖励
             return up + down + 1;
@@ -336,10 +355,22 @@ public class Algo {
     public static void dumpArray(BaseBox[][] boxes) {
         StringBuilder sb = new StringBuilder();
         for (BaseBox[] boxLine : boxes) {
+            sb.append("\n");
             for (BaseBox box : boxLine) {
                 sb.append(String.format(Locale.getDefault(), "%3d", box.mType)).append(",");
             }
-            sb.append("\n");
         }
+        Log.e(TAG, "\n" + sb.toString());
+    }
+
+    public static void dumpArray(int[][] boxes) {
+        StringBuilder sb = new StringBuilder();
+        for (int[] boxLine : boxes) {
+            sb.append("\n");
+            for (int box : boxLine) {
+                sb.append(String.format(Locale.getDefault(), "%3d", box)).append(",");
+            }
+        }
+        Log.e(TAG, "...\n" + sb.toString());
     }
 }

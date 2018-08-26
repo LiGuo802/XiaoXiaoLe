@@ -48,8 +48,8 @@ public class GameLayout extends FrameLayout {
         for (int i = 0; i < mBoxes.length; i++) {
             for (int j = 0; j < mBoxes[0].length; j++) {
                 addView(mBoxes[i][j], new FrameLayout.LayoutParams(BaseBox.SIZE, BaseBox.SIZE));
-                mBoxes[i][j].setX(i * (BaseBox.MARGIN + BaseBox.SIZE) + BaseBox.MARGIN);
-                mBoxes[i][j].setY(j * (BaseBox.MARGIN + BaseBox.SIZE) + BaseBox.MARGIN);
+                mBoxes[i][j].setX(j * (BaseBox.MARGIN + BaseBox.SIZE) + BaseBox.MARGIN);
+                mBoxes[i][j].setY(i * (BaseBox.MARGIN + BaseBox.SIZE) + BaseBox.MARGIN);
             }
         }
         //Algo.self(mBoxes, new int[mBoxes.length][mBoxes[0].length]);
@@ -93,13 +93,13 @@ public class GameLayout extends FrameLayout {
 
 
     private void handleActionDown(MotionEvent event) {
-        mLastDownX = getLocation(event.getX());
-        mLastDownY = getLocation(event.getY());
+        mLastDownX = getLocation(event.getY());
+        mLastDownY = getLocation(event.getX());
     }
 
     private void handleActionUp(MotionEvent event) {
-        int x = getLocation(event.getX());
-        int y = getLocation(event.getY());
+        int x = getLocation(event.getY());
+        int y = getLocation(event.getX());
 
         if (x == mLastDownX && y == mLastDownY) {
             // 点击事件

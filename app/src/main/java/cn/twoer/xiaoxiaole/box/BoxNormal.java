@@ -31,7 +31,6 @@ public class BoxNormal extends BaseBox {
             case 666:
                 return Color.CYAN;
         }
-        Log.e("BoxNormal", "white");
         return Color.WHITE;
     }
 
